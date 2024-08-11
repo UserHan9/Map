@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CHAR 1
+  m_Name: SENJASTA 2
   m_Shader: {fileID: 4800000, guid: f7e259e53e90b10609487429c9fe2f00, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -44,7 +44,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: bc7b745dc482d0cb1b49dcf96b421707, type: 3}
+        m_Texture: {fileID: 2800000, guid: c9c306894982afd4681556eb8e688c74, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -78,8 +78,8 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Offset: 0
-    - _OutlineThickness: 0.0056
-    - _OutlineWidth: -0.25
+    - _OutlineThickness: 0.0053
+    - _OutlineWidth: 0.1
     - _Parallax: 0.02
     - _ReadMask: 255
     - _SmoothnessTextureChannel: 0

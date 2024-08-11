@@ -12,50 +12,7 @@ Shader "Custom/ToonOutline"
         Tags { "RenderType"="Opaque" }
         LOD 200
 
-        Pass
-        {
-            Name "OUTLINE"
-            Tags { "LightMode"="Always" }
-            Cull Front
-
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-
-            uniform float _OutlineThickness;
-            uniform float4 _OutlineColor;
-
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float3 normal : NORMAL;
-            };
-
-            struct v2f
-            {
-                float4 pos : POSITION;
-                float4 color : COLOR;
-            };
-
-            v2f vert(appdata v)
-            {
-                // Calculate the outline offset
-                float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
-                float3 offset = norm * _OutlineThickness;
-                v2f o;
-                o.pos = UnityObjectToClipPos(v.vertex + float4(offset, 0));
-                o.color = _OutlineColor;
-                return o;
-            }
-
-            half4 frag(v2f i) : SV_Target
-            {
-                return i.color;
-            }
-            ENDCG
-        }
-
+        // Base pass (main texture rendering)
         Pass
         {
             Name "BASE"
@@ -63,9 +20,12 @@ Shader "Custom/ToonOutline"
             Cull Back
 
             CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma vertex vertBase
+            #pragma fragment fragBase
             #include "UnityCG.cginc"
+
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
 
             struct appdata
             {
@@ -79,19 +39,75 @@ Shader "Custom/ToonOutline"
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-
-            v2f vert(appdata v)
+            v2f vertBase(appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
 
-            half4 frag(v2f i) : SV_Target
+            half4 fragBase(v2f i) : SV_Target
             {
-                return tex2D(_MainTex, i.uv);
+                half4 texColor = tex2D(_MainTex, i.uv);
+                return texColor;
+            }
+            ENDCG
+        }
+
+        // Outline pass (only affects the outline)
+        Pass
+        {
+            Name "OUTLINE"
+            Tags { "LightMode"="Always" }
+            Cull Front
+            ZWrite Off
+            ZTest LEqual
+            ColorMask RGB
+
+            // Stencil operations
+            Stencil
+            {
+                Ref 1
+                Comp Always
+                Pass Replace
+                ZFail Keep
+            }
+
+            CGPROGRAM
+            #pragma vertex vertOutline
+            #pragma fragment fragOutline
+            #include "UnityCG.cginc"
+
+            uniform float _OutlineThickness;
+            uniform float4 _OutlineColor;
+
+            struct appdata_outline
+            {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+
+            struct v2f_outline
+            {
+                float4 pos : POSITION;
+                float4 color : COLOR;
+            };
+
+            v2f_outline vertOutline(appdata_outline v)
+            {
+                // Calculate the outline offset
+                float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
+                float3 offset = norm * _OutlineThickness;
+                v2f_outline o;
+                o.pos = UnityObjectToClipPos(v.vertex + float4(offset, 0));
+                o.color = _OutlineColor;
+                return o;
+            }
+
+            half4 fragOutline(v2f_outline i) : SV_Target
+            {
+                return i.color;
             }
             ENDCG
         }

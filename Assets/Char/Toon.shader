@@ -20,6 +20,10 @@ Shader "Supyrb/Unlit/Texture"
         [Enum(Off,0,On,1)] _ZWrite("ZWrite", Int) = 1
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("ZTest", Int) = 4
         [Enum(None,0,Alpha,1,Red,8,Green,4,Blue,2,RGB,14,RGBA,15)] _ColorMask("Color Mask", Int) = 15
+
+        // Outline properties
+        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        _OutlineThickness ("Outline Thickness", Range(0.001, 0.03)) = 0.005
     }
    
     CGINCLUDE
@@ -28,6 +32,10 @@ Shader "Supyrb/Unlit/Texture"
     half4 _Color;
     sampler2D _MainTex;
     float4 _MainTex_ST;
+
+    // Outline properties
+    float _OutlineThickness;
+    float4 _OutlineColor;
    
     struct appdata
     {
@@ -123,5 +131,54 @@ Shader "Supyrb/Unlit/Texture"
             ENDCG
         }
     }
+
+    // Outline SubShader
+    SubShader
+    {
+        Tags { "RenderType"="Opaque" "Queue" = "Overlay" }
+        Pass
+        {
+            Name "OUTLINE"
+            Tags { "LightMode"="Always" }
+            Cull Front
+            ZWrite On
+            ZTest LEqual
+
+            CGPROGRAM
+            #pragma vertex vertOutline
+            #pragma fragment fragOutline
+            #include "UnityCG.cginc"
+
+            struct appdata_outline
+            {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+
+            struct v2f_outline
+            {
+                float4 pos : POSITION;
+                float4 color : COLOR;
+            };
+
+            v2f_outline vertOutline(appdata_outline v)
+            {
+                UNITY_SETUP_INSTANCE_ID(v);
+
+                // Calculate the outline offset
+                float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
+                float3 offset = norm * _OutlineThickness;
+                v2f_outline o;
+                o.pos = UnityObjectToClipPos(v.vertex + float4(offset, 0));
+                o.color = _OutlineColor;
+                return o;
+            }
+
+            half4 fragOutline(v2f_outline i) : SV_Target
+            {
+                return i.color;
+            }
+            ENDCG
+        }
+    }
 }
- 
