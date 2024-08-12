@@ -4,7 +4,7 @@ Shader "Custom/ToonOutline"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _OutlineColor ("Outline Color", Color) = (0,0,0,1)
-        _OutlineThickness ("Outline Thickness", Range(0.001, 0.03)) = 0.005
+        _OutlineThickness ("Outline Thickness", Range(0.001, 0.08)) = 0.005
     }
 
     SubShader
