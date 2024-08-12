@@ -78,7 +78,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Offset: 0
-    - _OutlineThickness: 0.0056
+    - _OutlineThickness: 0.0094
     - _OutlineWidth: -0.25
     - _Parallax: 0.02
     - _ReadMask: 255

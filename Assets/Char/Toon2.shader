@@ -61,18 +61,9 @@ Shader "Custom/ToonOutline"
             Name "OUTLINE"
             Tags { "LightMode"="Always" }
             Cull Front
-            ZWrite Off
+            ZWrite On
             ZTest LEqual
             ColorMask RGB
-
-            // Stencil operations
-            Stencil
-            {
-                Ref 1
-                Comp Always
-                Pass Replace
-                ZFail Keep
-            }
 
             CGPROGRAM
             #pragma vertex vertOutline
